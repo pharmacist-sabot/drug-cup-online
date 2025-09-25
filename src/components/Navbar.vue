@@ -1,14 +1,30 @@
 <template>
-  <nav class="navbar">
-    <div class="nav-container">
-      <router-link to="/" class="nav-brand">ระบบเบิกยาออนไลน์</router-link>
+  <nav class="navbar no-print">
+    <div class="navbar-container">
+      <router-link to="/" class="navbar-brand">
+        <i class="fas fa-pills"></i>
+        ระบบเบิกยาออนไลน์
+      </router-link>
       <div class="nav-links" v-if="auth.isLoggedIn">
-        <router-link v-if="!auth.isAdmin" to="/pcu/dashboard">หน้าหลัก รพ.สต.</router-link>
-        <router-link v-if="auth.isAdmin" to="/admin/dashboard">หน้าหลัก Admin</router-link>
-        <router-link v-if="auth.isAdmin" to="/admin/reports">รายงาน</router-link>
+        <router-link v-if="!auth.isAdmin" to="/pcu/dashboard">
+          <i class="fas fa-tachometer-alt"></i> หน้าหลัก รพ.สต.
+        </router-link>
+        <router-link v-if="auth.isAdmin" to="/admin/dashboard">
+          <i class="fas fa-user-shield"></i> หน้าหลัก Admin
+        </router-link>
+        <router-link v-if="auth.isAdmin" to="/admin/reports">
+          <i class="fas fa-file-alt"></i> รายงาน
+        </router-link>
+        
         <div class="user-info">
-          <span>สวัสดี, {{ auth.profile?.username }} ({{ auth.isAdmin ? 'Admin' : auth.userPcuName }})</span>
-          <button @click="handleLogout">ออกจากระบบ</button>
+          <i class="fas fa-user-circle"></i>
+          <div class="user-details">
+            <span class="username">{{ auth.profile?.username }}</span>
+            <span class="role">{{ auth.isAdmin ? 'Admin' : auth.userPcuName }}</span>
+          </div>
+          <button @click="handleLogout" class="btn-logout" title="ออกจากระบบ">
+            <i class="fas fa-sign-out-alt"></i>
+          </button>
         </div>
       </div>
     </div>
@@ -16,27 +32,29 @@
 </template>
 
 <script setup>
-import { useAuthStore } from '@/store/auth'
-import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/store/auth';
+import { useRouter } from 'vue-router';
 
-const auth = useAuthStore()
-const router = useRouter()
+const auth = useAuthStore();
+const router = useRouter();
 
 async function handleLogout() {
-  await auth.logout()
-  router.push('/login')
+  await auth.logout();
+  router.push('/login');
 }
 </script>
 
 <style scoped>
 .navbar {
-  background-color: var(--dark-color);
-  color: white;
-  padding: 0.8rem 1.5rem;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  background-color: var(--surface-color);
+  box-shadow: var(--box-shadow);
+  padding: 0.75rem 1.5rem;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
 }
 
-.nav-container {
+.navbar-container {
   max-width: 1200px;
   margin: 0 auto;
   display: flex;
@@ -44,11 +62,19 @@ async function handleLogout() {
   align-items: center;
 }
 
-.nav-brand {
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: white;
+.navbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--primary-color);
   text-decoration: none;
+}
+
+.navbar-brand:hover {
+  text-decoration: none;
+  opacity: 0.8;
 }
 
 .nav-links {
@@ -58,31 +84,64 @@ async function handleLogout() {
 }
 
 .nav-links a {
-  color: var(--light-color);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-muted);
   text-decoration: none;
-  padding: 0.5rem;
+  padding: 0.5rem 0.75rem;
   border-radius: var(--border-radius);
-  transition: background-color 0.2s;
+  transition: background-color 0.2s, color 0.2s;
+  font-weight: 500;
 }
 
 .nav-links a:hover, .nav-links a.router-link-exact-active {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: var(--bg-color);
+  color: var(--primary-color);
+  text-decoration: none;
 }
 
 .user-info {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 0.75rem;
+  padding-left: 1.5rem;
+  border-left: 1px solid var(--border-color);
+  color: var(--text-color);
 }
 
-.user-info span {
-  font-size: 0.9rem;
+.user-info .fa-user-circle {
+  font-size: 2rem;
+  color: var(--secondary-color);
 }
 
-.user-info button {
-  background-color: var(--danger-color);
-  color: white;
-  padding: 0.4rem 0.8rem;
-  font-size: 0.9rem;
+.user-details {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.user-details .username {
+  font-weight: 600;
+}
+.user-details .role {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.btn-logout {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--secondary-color);
+  font-size: 1.5rem;
+  padding: 0.5rem;
+  border-radius: 50%;
+  line-height: 1;
+  transition: color 0.2s, background-color 0.2s;
+}
+.btn-logout:hover {
+  color: var(--danger-color);
+  background-color: #fbebee;
 }
 </style>

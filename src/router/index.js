@@ -10,6 +10,7 @@ import AdminDashboard from '@/views/admin/AdminDashboard.vue'
 import ReportGenerator from '@/views/admin/ReportGenerator.vue'
 import RequisitionDetail from '@/views/pcu/RequisitionDetail.vue' 
 import AdminRequisitionDetail from '@/views/admin/AdminRequisitionDetail.vue';
+import PrintableView from '@/views/admin/PrintableView.vue'; 
 
 const routes = [
   { 
@@ -30,14 +31,11 @@ const routes = [
     meta: { requiresAuth: true, requiresPcu: true } 
   },
   { 
-    // --- UPDATED PATH ---
-    // Added ':requisitionId?' to handle both 'new' and 'edit' modes.
-    // The '?' makes the parameter optional.
     path: '/pcu/requisition/:periodId/:requisitionId?', 
     name: 'RequisitionForm', 
     component: RequisitionForm, 
     meta: { requiresAuth: true, requiresPcu: true },
-    props: true // This allows the component to receive params as props
+    props: true 
   },
   { 
     path: '/admin/dashboard', 
@@ -52,7 +50,6 @@ const routes = [
     meta: { requiresAuth: true, requiresAdmin: true }
   },
   {
-    // Fallback route for any path that doesn't match
     path: '/:pathMatch(.*)*',
     redirect: '/'
   },
@@ -73,6 +70,12 @@ const routes = [
     component: AdminRequisitionDetail,
     meta: { requiresAuth: true, requiresAdmin: true },
     props: true
+  },
+  {
+    path: '/print/requisition',
+    name: 'PrintRequisition',
+    component: PrintableView,
+    meta: { requiresAuth: true, requiresAdmin: true }
   }
 ]
 
@@ -81,44 +84,38 @@ const router = createRouter({
   routes,
 })
 
-// Navigation Guard: Protects routes based on authentication and roles
 router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore()
   
-  // Try to fetch the user session if it's not already in the store
   if (!authStore.isLoggedIn) {
     await authStore.fetchSession()
   }
 
   const requiresAuth = to.matched.some(record => record.meta.requiresAuth)
 
-  // Redirect to login if route requires auth and user is not logged in
   if (requiresAuth && !authStore.isLoggedIn) {
     return next({ name: 'Login', query: { redirect: to.fullPath } });
   } 
   
-  // Redirect to home if user is already logged in and tries to access login page
   if (to.name === 'Login' && authStore.isLoggedIn) {
     return next({ name: 'Home' });
   }
 
-  // Role-based protection
   const isAdminRoute = to.matched.some(record => record.meta.requiresAdmin);
   const isPcuRoute = to.matched.some(record => record.meta.requiresPcu);
 
   if (isAdminRoute && !authStore.isAdmin) {
-    // Non-admin user trying to access admin route
+
     console.warn('Access denied: Non-admin user trying to access an admin route.');
     return next({ name: 'Home' });
   }
 
   if (isPcuRoute && authStore.isAdmin) {
-    // Admin trying to access a PCU-specific route
+
     console.warn('Access denied: Admin user trying to access a PCU route.');
     return next({ name: 'Home' });
   }
 
-  // If all checks pass, proceed to the requested route
   next()
 })
 

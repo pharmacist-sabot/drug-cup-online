@@ -1,16 +1,20 @@
 <template>
   <div class="container">
-    <h2>{{ isEditing ? 'แก้ไขใบเบิก' : 'สร้างใบเบิกใหม่' }} - {{ periodInfo?.name }}</h2>
+    <h2><i class="fas fa-file-signature"></i> {{ isEditing ? 'แก้ไขใบเบิก' : 'สร้างใบเบิกใหม่' }}</h2>
+    <p class="text-muted">{{ periodInfo?.name }}</p>
     
-    <div class="toolbar">
-      <input type="text" v-model="searchTerm" placeholder="ค้นหารายการยา..." class="search-input">
+    <div class="toolbar card">
+      <div class="form-group">
+        <label for="search"><i class="fas fa-search"></i> ค้นหารายการ</label>
+        <input type="text" id="search" v-model="searchTerm" placeholder="พิมพ์ชื่อยาเพื่อค้นหา..." class="search-input">
+      </div>
     </div>
     
     <div v-if="loading" class="loading">กำลังโหลดรายการ...</div>
     <div v-if="error" class="error">{{ error }}</div>
 
     <form @submit.prevent="submitForm" v-if="!loading && !error">
-      <div class="table-wrapper">
+      <div class="table-wrapper card">
         <table>
           <thead>
             <tr>
@@ -18,19 +22,19 @@
               <th>ประเภท</th>
               <th>รายการเวชภัณฑ์</th>
               <th>หน่วย</th>
-              <th>ราคา</th>
-              <th>จำนวนเบิก</th>
-              <th>มูลค่า</th>
+              <th class="text-right">ราคา</th>
+              <th class="text-center">จำนวนเบิก</th>
+              <th class="text-right">มูลค่า</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="item in filteredItems" :key="item.id">
-              <td>{{ item.item_order }}</td>
+              <td class="text-center">{{ item.item_order }}</td>
               <td>{{ item.category }}</td>
               <td>{{ item.name }}</td>
-              <td>{{ item.unit_pack }}</td>
+              <td class="text-center">{{ item.unit_pack }}</td>
               <td class="text-right">{{ formatCurrency(item.price_per_unit) }}</td>
-              <td>
+              <td class="text-center">
                 <input 
                   type="number" 
                   min="0"
@@ -52,10 +56,12 @@
         </table>
       </div>
       <div class="form-actions">
-        <button type="button" @click="saveDraft" class="btn-secondary" :disabled="isSubmitting">
+        <button type="button" @click="saveDraft" class="btn btn-secondary" :disabled="isSubmitting">
+          <i class="fas fa-save"></i>
           {{ isSubmitting ? 'กำลังบันทึก...' : 'บันทึกฉบับร่าง' }}
         </button>
-        <button type="submit" class="btn-success" :disabled="isSubmitting">
+        <button type="submit" class="btn btn-success" :disabled="isSubmitting">
+          <i class="fas fa-paper-plane"></i>
           {{ isSubmitting ? 'กำลังส่ง...' : 'ส่งใบเบิก' }}
         </button>
       </div>
@@ -65,13 +71,13 @@
 
 <script setup>
 import { ref, onMounted, computed } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRouter } from 'vue-router'
 import { supabase } from '@/supabaseClient'
 import { useAuthStore } from '@/store/auth'
 
 const props = defineProps({
   periodId: String,
-  requisitionId: String // รับ ID ของใบเบิกจาก URL
+  requisitionId: String
 })
 
 const router = useRouter()
@@ -90,7 +96,7 @@ const isEditing = computed(() => props.requisitionId && props.requisitionId !== 
 
 onMounted(async () => {
   try {
-    // 1. Load period info
+
     const { data: periodData, error: periodError } = await supabase
       .from('requisition_periods_drugcupsabot')
       .select('name')
@@ -99,7 +105,6 @@ onMounted(async () => {
     if (periodError) throw periodError
     periodInfo.value = periodData
 
-    // 2. Load all active items
     const { data: itemsData, error: itemsError } = await supabase
       .from('items_drugcupsabot')
       .select('*')
@@ -109,7 +114,6 @@ onMounted(async () => {
     if (itemsError) throw itemsError
     items.value = itemsData
 
-    // 3. If editing, load existing draft data
     if (isEditing.value) {
       const { data: existingData, error: draftError } = await supabase
         .from('requisition_items_drugcupsabot')
@@ -166,7 +170,6 @@ async function saveRequisition(status) {
   try {
     let currentRequisitionId = isEditing.value ? props.requisitionId : null;
 
-    // --- Logic จัดการ Header ของใบเบิก (สร้างใหม่หรือใช้ของเดิม) ---
     if (!isEditing.value) {
       const { data: newHeader, error: headerError } = await supabase
         .from('requisitions_drugcupsabot')
@@ -174,7 +177,7 @@ async function saveRequisition(status) {
           pcu_id: auth.userPcuId,
           period_id: props.periodId,
           requester_id: auth.userProfile.id,
-          status: 'draft' // เริ่มต้นเป็น draft เสมอ
+          status: 'draft'
         })
         .select('id')
         .single();
@@ -183,15 +186,12 @@ async function saveRequisition(status) {
       currentRequisitionId = newHeader.id;
     }
 
-    // --- Logic จัดการ Items (ลบของเก่าทิ้งทั้งหมด แล้วใส่ของใหม่) ---
-    // 1. ลบรายการเก่าทั้งหมดของใบเบิกนี้ (ง่ายที่สุดสำหรับการ update)
     const { error: deleteError } = await supabase
       .from('requisition_items_drugcupsabot')
       .delete()
       .eq('requisition_id', currentRequisitionId);
     if (deleteError) throw deleteError;
 
-    // 2. เตรียมรายการใหม่ที่จะใส่เข้าไป
     const itemsToInsert = Object.entries(requisitionData.value)
       .filter(([_, quantity]) => quantity > 0 && quantity !== null)
       .map(([itemId, quantity]) => {
@@ -204,7 +204,6 @@ async function saveRequisition(status) {
         };
       });
 
-    // 3. ใส่รายการใหม่เข้าไป (ถ้ามี)
     if (itemsToInsert.length > 0) {
       const { error: insertError } = await supabase
         .from('requisition_items_drugcupsabot')
@@ -212,7 +211,6 @@ async function saveRequisition(status) {
       if (insertError) throw insertError;
     }
 
-    // 4. อัปเดตสถานะของใบเบิกหลัก (Header)
     const { error: updateStatusError } = await supabase
       .from('requisitions_drugcupsabot')
       .update({
@@ -242,51 +240,46 @@ function submitForm() {
     saveRequisition('submitted');
   }
 }
-
 </script>
 
 <style scoped>
+h2 {
+  border: none;
+  padding-bottom: 0;
+  margin-bottom: 0.25rem;
+}
+h2 i {
+  color: var(--primary-color);
+  margin-right: 0.75rem;
+}
+.text-muted {
+  margin-top: 0;
+  margin-bottom: 2rem;
+  color: var(--text-muted);
+}
 .toolbar {
   margin-bottom: 1.5rem;
 }
+.toolbar .form-group {
+  margin-bottom: 0;
+}
 .search-input {
-  width: 100%;
   max-width: 400px;
 }
 .table-wrapper {
   max-height: 60vh;
   overflow-y: auto;
-  border: 1px solid var(--border-color);
+  border: none; 
+  padding: 0;
 }
-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-th, td {
-  padding: 0.75rem;
-  border: 1px solid var(--border-color);
-  text-align: left;
-}
-thead {
-  background-color: var(--light-color);
+table thead {
   position: sticky;
   top: 0;
   z-index: 1;
 }
 .quantity-input {
-  width: 80px;
+  width: 90px;
   text-align: center;
-}
-.text-right {
-  text-align: right;
-}
-.bold {
-  font-weight: bold;
-}
-tfoot {
-  background-color: #e9ecef;
-  position: sticky;
-  bottom: 0;
 }
 .form-actions {
   margin-top: 2rem;
@@ -294,14 +287,7 @@ tfoot {
   justify-content: flex-end;
   gap: 1rem;
 }
-.btn-secondary {
-  background-color: var(--secondary-color);
-}
-.btn-secondary:hover {
-  background-color: #5a6268;
-}
-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+td.text-center, th.text-center {
+  text-align: center;
 }
 </style>

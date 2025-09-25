@@ -1,19 +1,23 @@
 <template>
   <div class="login-wrapper">
-    <div class="login-container">
-      <h1>เข้าสู่ระบบ</h1>
-      <p>ระบบเบิกยาออนไลน์ โรงพยาบาลสระโบสถ์</p>
+    <div class="card login-container">
+      <div class="login-header">
+        <i class="fas fa-hospital-user"></i>
+        <h1>เข้าสู่ระบบ</h1>
+        <p>ระบบเบิกยาออนไลน์ โรงพยาบาลสระโบสถ์</p>
+      </div>
       <form @submit.prevent="handleLogin">
         <div class="form-group">
           <label for="email">อีเมล</label>
-          <input type="email" id="email" v-model="email" required>
+          <input type="email" id="email" v-model="email" required placeholder="name@example.com">
         </div>
         <div class="form-group">
           <label for="password">รหัสผ่าน</label>
-          <input type="password" id="password" v-model="password" required>
+          <input type="password" id="password" v-model="password" required placeholder="********">
         </div>
         <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
-        <button type="submit" class="btn-primary" :disabled="loading">
+        <button type="submit" class="btn btn-primary" :disabled="loading">
+          <i class="fas fa-sign-in-alt"></i>
           {{ loading ? 'กำลังเข้าสู่ระบบ...' : 'เข้าสู่ระบบ' }}
         </button>
       </form>
@@ -22,28 +26,27 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { useAuthStore } from '@/store/auth'
-import { useRouter } from 'vue-router'
+import { ref } from 'vue';
+import { useAuthStore } from '@/store/auth';
+import { useRouter } from 'vue-router';
 
-const email = ref('')
-const password = ref('')
-const loading = ref(false)
-const errorMessage = ref('')
-
-const authStore = useAuthStore()
-const router = useRouter()
+const email = ref('');
+const password = ref('');
+const loading = ref(false);
+const errorMessage = ref('');
+const authStore = useAuthStore();
+const router = useRouter();
 
 async function handleLogin() {
-  loading.value = true
-  errorMessage.value = ''
+  loading.value = true;
+  errorMessage.value = '';
   try {
-    await authStore.login(email.value, password.value)
-    router.push('/')
+    await authStore.login(email.value, password.value);
+    router.push('/');
   } catch (error) {
-    errorMessage.value = error.message || 'อีเมลหรือรหัสผ่านไม่ถูกต้อง'
+    errorMessage.value = error.message || 'อีเมลหรือรหัสผ่านไม่ถูกต้อง';
   } finally {
-    loading.value = false
+    loading.value = false;
   }
 }
 </script>
@@ -53,27 +56,35 @@ async function handleLogin() {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 80vh;
+  flex-grow: 1;
+  background: linear-gradient(135deg, #e6f0ff, #f8f9fa);
 }
 .login-container {
   width: 100%;
-  max-width: 400px;
-  padding: 2.5rem;
-  background: white;
-  box-shadow: var(--box-shadow);
-  border-radius: var(--border-radius);
+  max-width: 420px;
   text-align: center;
+  padding: 2.5rem;
+  border: none;
+  box-shadow: var(--box-shadow-lg);
 }
-h1 {
+.login-header .fa-hospital-user {
+  font-size: 3rem;
+  color: var(--primary-color);
+  margin-bottom: 1rem;
+}
+.login-header h1 {
+  font-size: 1.75rem;
   margin-bottom: 0.5rem;
 }
-p {
-  color: var(--secondary-color);
+.login-header p {
+  color: var(--text-muted);
   margin-bottom: 2rem;
 }
 button {
   width: 100%;
   margin-top: 1rem;
+  padding: 0.75rem;
+  font-size: 1.1rem;
 }
 .error-message {
   color: var(--danger-color);

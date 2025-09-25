@@ -48,17 +48,10 @@
               <td>{{ reqItem.items_drugcupsabot.name }}</td>
               <td class="text-center">{{ reqItem.quantity }}</td>
               <td class="text-center bold status-approved">
-                <!-- 
-                  แสดง approved_quantity ถ้ามี (สถานะ approved/fulfilled)
-                  ถ้ายังไม่มี (สถานะ draft/submitted) ให้แสดงเครื่องหมาย - 
-                -->
                 {{ reqItem.approved_quantity ?? '-' }}
               </td>
               <td class="text-right">{{ formatCurrency(reqItem.price_at_request) }}</td>
               <td class="text-right">
-                <!-- 
-                  คำนวณมูลค่าจากจำนวนที่อนุมัติ ถ้ายังไม่มีให้อนุมัติ ให้คำนวณจากจำนวนที่ขอเบิกไปก่อน
-                -->
                 {{ formatCurrency((reqItem.approved_quantity ?? reqItem.quantity) * reqItem.price_at_request) }}
               </td>
             </tr>
@@ -105,7 +98,6 @@ onMounted(async () => {
       .single();
 
     if (fetchError) {
-        // RLS might deny access if the user is not the owner, this is expected
         if (fetchError.code === 'PGRST116') {
             throw new Error('ไม่พบข้อมูลใบเบิก หรือคุณไม่มีสิทธิ์เข้าถึง');
         }
@@ -124,7 +116,6 @@ onMounted(async () => {
 const grandTotal = computed(() => {
   if (!requisition.value || !requisition.value.requisition_items_drugcupsabot) return 0;
   
-  // คำนวณยอดรวมจาก approved_quantity ถ้ามี, ถ้าไม่มีให้ใช้ quantity เดิม
   return requisition.value.requisition_items_drugcupsabot.reduce((sum, item) => {
     const quantityToUse = item.approved_quantity ?? item.quantity;
     const itemTotal = Number(quantityToUse) * Number(item.price_at_request);
