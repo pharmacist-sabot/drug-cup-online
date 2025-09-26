@@ -6,14 +6,25 @@
         ระบบเบิกยาออนไลน์
       </router-link>
       <div class="nav-links" v-if="auth.isLoggedIn">
+        
         <router-link v-if="!auth.isAdmin" to="/pcu/dashboard">
           <i class="fas fa-tachometer-alt"></i> หน้าหลัก รพ.สต.
         </router-link>
+
         <router-link v-if="auth.isAdmin" to="/admin/dashboard">
           <i class="fas fa-user-shield"></i> หน้าหลัก Admin
         </router-link>
+        
+        <router-link v-if="auth.isAdmin" to="/admin/item-management">
+          <i class="fas fa-dolly-flatbed"></i> จัดการยา
+        </router-link>
+
+        <router-link v-if="auth.isAdmin" to="/admin/requisition-summary">
+          <i class="fas fa-calculator"></i> สรุปผล
+        </router-link>
+
         <router-link v-if="auth.isAdmin" to="/admin/reports">
-          <i class="fas fa-file-alt"></i> รายงาน
+          <i class="fas fa-file-alt"></i> พิมพ์รายงาน
         </router-link>
         
         <div class="user-info">

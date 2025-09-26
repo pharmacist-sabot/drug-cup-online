@@ -54,38 +54,62 @@ async function handleLogin() {
 <style scoped>
 .login-wrapper {
   display: flex;
-  justify-content: center;
-  align-items: center;
+  justify-content: center; 
+  align-items: center; 
   flex-grow: 1;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100vh; 
   background: linear-gradient(135deg, #e6f0ff, #f8f9fa);
 }
+
 .login-container {
   width: 100%;
   max-width: 420px;
   text-align: center;
   padding: 2.5rem;
   border: none;
-  box-shadow: var(--box-shadow-lg);
+  box-shadow: var(--box-shadow-lg); 
+  animation: fade-in 0.5s ease-out; 
 }
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .login-header .fa-hospital-user {
   font-size: 3rem;
   color: var(--primary-color);
   margin-bottom: 1rem;
 }
+
 .login-header h1 {
   font-size: 1.75rem;
   margin-bottom: 0.5rem;
+  border: none; 
 }
+
 .login-header p {
   color: var(--text-muted);
   margin-bottom: 2rem;
 }
+
 button {
   width: 100%;
   margin-top: 1rem;
   padding: 0.75rem;
   font-size: 1.1rem;
 }
+
 .error-message {
   color: var(--danger-color);
   margin-top: 1rem;

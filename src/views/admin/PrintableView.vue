@@ -150,6 +150,14 @@ function formatDate(dateString) {
 }
 </script>
 
+<style>
+@media print {
+  @page {
+    size: A4 portrait; 
+  }
+}
+</style>
+
 <style scoped>
 /* A4 page styles */
 body {

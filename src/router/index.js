@@ -1,29 +1,41 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/store/auth'
 
-// Import components for routes
+// Import Components 
 import Login from '@/views/Login.vue'
 import Home from '@/views/Home.vue'
+
+// PCU Views
 import PcuDashboard from '@/views/pcu/PcuDashboard.vue'
 import RequisitionForm from '@/views/pcu/RequisitionForm.vue'
-import AdminDashboard from '@/views/admin/AdminDashboard.vue'
-import ReportGenerator from '@/views/admin/ReportGenerator.vue'
 import RequisitionDetail from '@/views/pcu/RequisitionDetail.vue' 
-import AdminRequisitionDetail from '@/views/admin/AdminRequisitionDetail.vue';
-import PrintableView from '@/views/admin/PrintableView.vue'; 
 
+// Admin Views
+import AdminDashboard from '@/views/admin/AdminDashboard.vue'
+import AdminRequisitionDetail from '@/views/admin/AdminRequisitionDetail.vue'
+import ReportGenerator from '@/views/admin/ReportGenerator.vue'
+import ItemManagement from '@/views/admin/ItemManagement.vue'
+import RequisitionSummary from '@/views/admin/RequisitionSummary.vue'
+import PrintableView from '@/views/admin/PrintableView.vue'
+import RequisitionSummaryPrint from '@/views/admin/RequisitionSummaryPrint.vue'
+
+// Define Routes 
 const routes = [
   { 
     path: '/login', 
     name: 'Login', 
     component: Login 
   },
+
+  // Authenticated Routes 
   { 
     path: '/', 
     name: 'Home', 
     component: Home, 
     meta: { requiresAuth: true } 
   },
+
+  // PCU Specific Routes 
   { 
     path: '/pcu/dashboard', 
     name: 'PcuDashboard', 
@@ -37,10 +49,38 @@ const routes = [
     meta: { requiresAuth: true, requiresPcu: true },
     props: true 
   },
+  {
+    path: '/pcu/history/:requisitionId',
+    name: 'RequisitionDetail',
+    component: RequisitionDetail,
+    meta: { requiresAuth: true, requiresPcu: true },
+    props: true
+  },
+
+  // Admin Specific Routes 
   { 
     path: '/admin/dashboard', 
     name: 'AdminDashboard', 
     component: AdminDashboard, 
+    meta: { requiresAuth: true, requiresAdmin: true }
+  },
+  {
+    path: '/admin/requisition/:requisitionId',
+    name: 'AdminRequisitionDetail',
+    component: AdminRequisitionDetail,
+    meta: { requiresAuth: true, requiresAdmin: true },
+    props: true
+  },
+  { 
+    path: '/admin/item-management', 
+    name: 'ItemManagement',
+    component: ItemManagement,
+    meta: { requiresAuth: true, requiresAdmin: true }
+  },
+  {
+    path: '/admin/requisition-summary',
+    name: 'RequisitionSummary',
+    component: RequisitionSummary,
     meta: { requiresAuth: true, requiresAdmin: true }
   },
   { 
@@ -50,43 +90,35 @@ const routes = [
     meta: { requiresAuth: true, requiresAdmin: true }
   },
   {
-    path: '/:pathMatch(.*)*',
-    redirect: '/'
-  },
-  {
-    path: '/pcu/history/:requisitionId',
-    name: 'RequisitionDetail',
-    component: RequisitionDetail,
-    meta: { requiresAuth: true, requiresPcu: true },
-    props: true
-  },
-  {
-    path: '/:pathMatch(.*)*',
-    redirect: '/'
-  },
-  {
-    path: '/admin/requisition/:requisitionId',
-    name: 'AdminRequisitionDetail',
-    component: AdminRequisitionDetail,
-    meta: { requiresAuth: true, requiresAdmin: true },
-    props: true
-  },
-  {
     path: '/print/requisition',
     name: 'PrintRequisition',
     component: PrintableView,
     meta: { requiresAuth: true, requiresAdmin: true }
+  },
+  {
+    path: '/print/summary',
+    name: 'PrintRequisitionSummary',
+    component: RequisitionSummaryPrint,
+    meta: { requiresAuth: true, requiresAdmin: true }
+  },
+
+  // Fallback Route 
+  {
+    path: '/:pathMatch(.*)*',
+    redirect: '/'
   }
 ]
 
+// Create Router Instance 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes,
 })
 
+// Navigation Guard 
 router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore()
-  
+
   if (!authStore.isLoggedIn) {
     await authStore.fetchSession()
   }
@@ -101,17 +133,16 @@ router.beforeEach(async (to, from, next) => {
     return next({ name: 'Home' });
   }
 
+  // Role-based protection
   const isAdminRoute = to.matched.some(record => record.meta.requiresAdmin);
   const isPcuRoute = to.matched.some(record => record.meta.requiresPcu);
 
   if (isAdminRoute && !authStore.isAdmin) {
-
     console.warn('Access denied: Non-admin user trying to access an admin route.');
     return next({ name: 'Home' });
   }
 
   if (isPcuRoute && authStore.isAdmin) {
-
     console.warn('Access denied: Admin user trying to access a PCU route.');
     return next({ name: 'Home' });
   }

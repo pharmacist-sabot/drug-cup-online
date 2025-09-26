@@ -28,10 +28,16 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="item in filteredItems" :key="item.id">
+            <tr v-for="item in filteredItems" :key="item.id" :class="{ 'locked-item': !item.is_available }">
               <td class="text-center">{{ item.item_order }}</td>
               <td>{{ item.category }}</td>
-              <td>{{ item.name }}</td>
+              <td>
+                {{ item.name }}
+
+                <span v-if="!item.is_available && item.notes" class="item-note">
+                  ({{ item.notes }})
+                </span>
+              </td>
               <td class="text-center">{{ item.unit_pack }}</td>
               <td class="text-right">{{ formatCurrency(item.price_per_unit) }}</td>
               <td class="text-center">
@@ -42,6 +48,7 @@
                   v-model.number="requisitionData[item.id]"
                   @input="updateTotal"
                   @focus="$event.target.select()"
+                  :disabled="!item.is_available" 
                 >
               </td>
               <td class="text-right">{{ formatCurrency(calculateValue(item)) }}</td>
@@ -96,7 +103,6 @@ const isEditing = computed(() => props.requisitionId && props.requisitionId !== 
 
 onMounted(async () => {
   try {
-
     const { data: periodData, error: periodError } = await supabase
       .from('requisition_periods_drugcupsabot')
       .select('name')
@@ -129,7 +135,8 @@ onMounted(async () => {
         updateTotal()
       }
     }
-  } catch (err) {
+  } catch (err)
+ {
     error.value = 'ไม่สามารถโหลดข้อมูลได้: ' + err.message
     console.error(err)
   } finally {
@@ -145,6 +152,12 @@ const filteredItems = computed(() => {
 })
 
 function calculateValue(item) {
+  if (!item.is_available) {
+    if (requisitionData.value[item.id]) {
+      requisitionData.value[item.id] = 0;
+    }
+    return 0;
+  }
   const quantity = requisitionData.value[item.id] || 0
   return quantity * item.price_per_unit
 }
@@ -193,7 +206,10 @@ async function saveRequisition(status) {
     if (deleteError) throw deleteError;
 
     const itemsToInsert = Object.entries(requisitionData.value)
-      .filter(([_, quantity]) => quantity > 0 && quantity !== null)
+      .filter(([itemId, quantity]) => {
+        const itemDetails = items.value.find(i => i.id == itemId);
+        return quantity > 0 && quantity !== null && itemDetails && itemDetails.is_available;
+      })
       .map(([itemId, quantity]) => {
         const itemDetails = items.value.find(i => i.id == itemId);
         return {
@@ -290,4 +306,20 @@ table thead {
 td.text-center, th.text-center {
   text-align: center;
 }
+
+.locked-item {
+  background-color: #f8f9fa; 
+  color: #adb5bd; 
+}
+.locked-item .quantity-input {
+  background-color: #e9ecef; 
+  cursor: not-allowed; 
+}
+.item-note {
+  font-weight: bold;
+  color: var(--danger-color); 
+  margin-left: 0.5rem;
+  font-size: 0.9em;
+}
+
 </style>
