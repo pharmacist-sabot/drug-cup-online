@@ -1,10 +1,23 @@
 <template>
-  <Navbar v-if="$route.name !== 'Login'" />
-  <main>
+  <div v-if="!auth.isLoggedIn || isPublicPage">
     <router-view />
-  </main>
+  </div>
+  <AdminLayout v-else-if="auth.isAdmin" />
+  <PcuLayout v-else /> 
 </template>
 
 <script setup>
-import Navbar from './components/Navbar.vue'
+import { computed } from 'vue';
+import { useRoute } from 'vue-router';
+import { useAuthStore } from '@/store/auth';
+import AdminLayout from '@/layouts/AdminLayout.vue';
+import PcuLayout from '@/layouts/PcuLayout.vue'; 
+
+const auth = useAuthStore();
+const route = useRoute();
+
+const isPublicPage = computed(() => {
+  const publicPages = ['Login', 'Home', 'PrintRequisition', 'PrintRequisitionSummary'];
+  return publicPages.includes(route.name);
+});
 </script>

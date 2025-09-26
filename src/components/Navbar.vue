@@ -3,35 +3,18 @@
     <div class="navbar-container">
       <router-link to="/" class="navbar-brand">
         <i class="fas fa-pills"></i>
-        ระบบเบิกยาออนไลน์
+        ระบบเบิกยาออนไลน์ โรงพยาบาลสระโบสถ์
       </router-link>
       <div class="nav-links" v-if="auth.isLoggedIn">
-        
-        <router-link v-if="!auth.isAdmin" to="/pcu/dashboard">
+        <router-link to="/pcu/dashboard">
           <i class="fas fa-tachometer-alt"></i> หน้าหลัก รพ.สต.
-        </router-link>
-
-        <router-link v-if="auth.isAdmin" to="/admin/dashboard">
-          <i class="fas fa-user-shield"></i> หน้าหลัก Admin
-        </router-link>
-        
-        <router-link v-if="auth.isAdmin" to="/admin/item-management">
-          <i class="fas fa-dolly-flatbed"></i> จัดการยา
-        </router-link>
-
-        <router-link v-if="auth.isAdmin" to="/admin/requisition-summary">
-          <i class="fas fa-calculator"></i> สรุปผล
-        </router-link>
-
-        <router-link v-if="auth.isAdmin" to="/admin/reports">
-          <i class="fas fa-file-alt"></i> พิมพ์รายงาน
         </router-link>
         
         <div class="user-info">
           <i class="fas fa-user-circle"></i>
           <div class="user-details">
             <span class="username">{{ auth.profile?.username }}</span>
-            <span class="role">{{ auth.isAdmin ? 'Admin' : auth.userPcuName }}</span>
+            <span class="role">{{ auth.userPcuName }}</span>
           </div>
           <button @click="handleLogout" class="btn-logout" title="ออกจากระบบ">
             <i class="fas fa-sign-out-alt"></i>

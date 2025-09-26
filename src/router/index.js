@@ -18,9 +18,11 @@ import ItemManagement from '@/views/admin/ItemManagement.vue'
 import RequisitionSummary from '@/views/admin/RequisitionSummary.vue'
 import PrintableView from '@/views/admin/PrintableView.vue'
 import RequisitionSummaryPrint from '@/views/admin/RequisitionSummaryPrint.vue'
+import SystemSettings from '@/views/admin/SystemSettings.vue';
 
 // Define Routes 
 const routes = [
+  // Public Routes
   { 
     path: '/login', 
     name: 'Login', 
@@ -90,6 +92,14 @@ const routes = [
     meta: { requiresAuth: true, requiresAdmin: true }
   },
   {
+    path: '/admin/settings', 
+    name: 'SystemSettings',
+    component: SystemSettings,
+    meta: { requiresAuth: true, requiresAdmin: true }
+  },
+  
+  // Print Routes (No Layout)
+  {
     path: '/print/requisition',
     name: 'PrintRequisition',
     component: PrintableView,
@@ -109,13 +119,11 @@ const routes = [
   }
 ]
 
-// Create Router Instance 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes,
 })
 
-// Navigation Guard 
 router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore()
 
@@ -133,7 +141,6 @@ router.beforeEach(async (to, from, next) => {
     return next({ name: 'Home' });
   }
 
-  // Role-based protection
   const isAdminRoute = to.matched.some(record => record.meta.requiresAdmin);
   const isPcuRoute = to.matched.some(record => record.meta.requiresPcu);
 

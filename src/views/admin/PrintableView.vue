@@ -1,5 +1,3 @@
-// src/views/admin/PrintableView.vue
-
 <template>
   <div class="print-container" v-if="requisition">
     <div class="page">
@@ -45,7 +43,7 @@
               <td class="center">{{ item.items_drugcupsabot.unit_pack }}</td>
               <td></td>
             </tr>
-            <!-- เพิ่มบรรทัดว่างเพื่อให้ตารางดูเต็ม -->
+
             <tr v-for="n in emptyRows" :key="'empty-'+n">
               <td>&nbsp;</td>
               <td></td>
@@ -61,23 +59,23 @@
       <div class="signature-section">
         <div class="signature-box">
           <p>ลงชื่อ ..................................................... ผู้เบิก</p>
-          <p>(.....................................................)</p>
-          <p>ตำแหน่ง .................................................</p>
+          <p>({{ personnel?.requester_name || '.....................................................' }})</p>
+          <p>ตำแหน่ง {{ personnel?.requester_position || '.................................................' }}</p>
         </div>
         <div class="signature-box">
-          <p>ลงชื่อ ..................................................... ผู้รับ</p>
-          <p>(.....................................................)</p>
-          <p>ตำแหน่ง .................................................</p>
+          <p>ลงชื่อ ..................................................... ผู้รับของ</p>
+          <p>({{ personnel?.receiver_name || '.....................................................' }})</p>
+          <p>ตำแหน่ง {{ personnel?.receiver_position || '.................................................' }}</p>
         </div>
         <div class="signature-box">
           <p>ลงชื่อ ..................................................... ผู้อนุมัติ</p>
-          <p>(.....................................................)</p>
-          <p>ตำแหน่ง .................................................</p>
+          <p>(นายกิตติคุณ เขียวขำ)</p>
+          <p>ตำแหน่ง เภสัชกรปฏิบัติการ</p>
         </div>
         <div class="signature-box">
           <p>ลงชื่อ ..................................................... ผู้จ่าย</p>
-          <p>(.....................................................)</p>
-          <p>ตำแหน่ง .................................................</p>
+          <p>(นางสาวศศิธร เสนา)</p>
+          <p>ตำแหน่ง เจ้าพนักงานเภสัชกรรมชำนาญงาน</p>
         </div>
       </div>
     </div>
@@ -94,8 +92,8 @@ import { supabase } from '@/supabaseClient';
 
 const route = useRoute();
 const requisition = ref(null);
+const personnel = ref(null); 
 const loading = ref(true);
-
 const requisitionId = route.query.id;
 
 const emptyRows = computed(() => {
@@ -111,11 +109,11 @@ onMounted(async () => {
   }
 
   try {
-    const { data, error } = await supabase
+    const { data: requisitionData, error: requisitionError } = await supabase
       .from('requisitions_drugcupsabot')
       .select(`
         id, status, submitted_at,
-        pcus_drugcupsabot (name),
+        pcus_drugcupsabot (id, name),
         requisition_periods_drugcupsabot (name),
         requisition_items_drugcupsabot (
           quantity, approved_quantity,
@@ -125,15 +123,31 @@ onMounted(async () => {
       .eq('id', requisitionId)
       .single();
 
-    if (error) throw error;
-    requisition.value = data;
-    
+    if (requisitionError) throw requisitionError;
+    requisition.value = requisitionData;
+
+    if (requisitionData && requisitionData.pcus_drugcupsabot?.id) {
+      const pcuId = requisitionData.pcus_drugcupsabot.id;
+      
+      const { data: personnelData, error: personnelError } = await supabase
+        .from('pcu_personnel_drugcupsabot')
+        .select('*')
+        .eq('pcu_id', pcuId)
+        .single(); 
+      
+      if (personnelError && personnelError.code !== 'PGRST116') {
+        throw personnelError;
+      }
+      
+      personnel.value = personnelData; 
+    }
+
     setTimeout(() => {
       window.print();
     }, 500); 
 
   } catch (err) {
-    console.error("Error fetching requisition for printing:", err);
+    console.error("Error fetching data for printing:", err);
     document.body.innerHTML = `เกิดข้อผิดพลาด: ${err.message}`;
   } finally {
     loading.value = false;
@@ -150,6 +164,7 @@ function formatDate(dateString) {
 }
 </script>
 
+
 <style>
 @media print {
   @page {
@@ -158,6 +173,7 @@ function formatDate(dateString) {
 }
 </style>
 
+<!-- Scoped styles for this component -->
 <style scoped>
 /* A4 page styles */
 body {
@@ -281,5 +297,4 @@ td.center {
     page-break-before: auto; 
   }
 }
-
 </style>
