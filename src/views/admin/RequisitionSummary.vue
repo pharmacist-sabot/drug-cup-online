@@ -20,6 +20,7 @@
     </div>
     
     <div v-if="loading" class="loading">กำลังประมวลผล...</div>
+    <div v-if="error" class="error">{{ error }}</div>
 
     <div v-if="processedData.length > 0" class="card">
       <div class="table-wrapper">
@@ -46,20 +47,27 @@
 
       <div class="print-actions no-print">
         <button @click="printSummary" class="btn btn-primary">
-          <i class="fas fa-print"></i> พิมพ์ใบสรุปผลใบเบิก
+          <i class="fas fa-print"></i> พิมพ์ใบสรุปยอดรวม
         </button>
       </div>
     </div>
+    
+    <div v-else-if="!loading && selectedPeriod" class="card no-data-message text-center">
+      <i class="fas fa-info-circle"></i>
+      <p>ไม่พบข้อมูลใบเบิกที่อนุมัติแล้วในรอบนี้</p>
+    </div>
+
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import { useRouter } from 'vue-router'; 
+import { useRouter } from 'vue-router';
 import { supabase } from '@/supabaseClient';
 
-const router = useRouter(); 
+const router = useRouter();
 const loading = ref(false);
+const error = ref(null);
 const periods = ref([]);
 const pcuList = ref([]);
 const selectedPeriod = ref(null);
@@ -67,31 +75,43 @@ const selectedPcu = ref('all');
 const processedData = ref([]);
 
 onMounted(async () => {
-  const { data: periodsData } = await supabase.from('requisition_periods_drugcupsabot').select('id, name').order('start_date', { ascending: false });
-  periods.value = periodsData;
-  const { data: pcusData } = await supabase.from('pcus_drugcupsabot').select('id, name').order('name');
-  pcuList.value = pcusData;
+  try {
+    const { data: periodsData } = await supabase.from('requisition_periods_drugcupsabot').select('id, name').order('start_date', { ascending: false });
+    periods.value = periodsData || [];
+    const { data: pcusData } = await supabase.from('pcus_drugcupsabot').select('id, name').order('name');
+    pcuList.value = pcusData || [];
+  } catch (err) {
+    error.value = 'ไม่สามารถโหลดข้อมูลเริ่มต้นได้';
+    console.error(err);
+  }
 });
 
 async function processRequisitions() {
   if (!selectedPeriod.value) return;
   loading.value = true;
+  error.value = null;
   processedData.value = [];
 
   try {
-    const { data, error } = await supabase
+    const { data, error: fetchError } = await supabase
       .from('requisition_items_drugcupsabot')
       .select(`
         approved_quantity,
         items_drugcupsabot (id, name),
-        requisitions_drugcupsabot (pcu_id)
+        requisitions_drugcupsabot (pcu_id, status, period_id)
       `)
       .in('requisitions_drugcupsabot.status', ['approved', 'fulfilled'])
       .eq('requisitions_drugcupsabot.period_id', selectedPeriod.value);
       
-    if (error) throw error;
+    if (fetchError) throw fetchError;
     
     const summary = data.reduce((acc, current) => {
+
+      if (!current.requisitions_drugcupsabot || !current.items_drugcupsabot) {
+        console.warn('Skipping orphaned requisition item:', current);
+        return acc; 
+      }
+      
       const itemId = current.items_drugcupsabot.id;
       const itemName = current.items_drugcupsabot.name;
       const pcuId = current.requisitions_drugcupsabot.pcu_id;
@@ -116,7 +136,7 @@ async function processRequisitions() {
     
   } catch (err) {
     console.error("Error processing requisitions:", err);
-    alert('เกิดข้อผิดพลาดในการประมวลผล');
+    error.value = 'เกิดข้อผิดพลาดในการประมวลผลข้อมูลใบเบิก';
   } finally {
     loading.value = false;
   }
@@ -147,17 +167,35 @@ function printSummary() {
 </script>
 
 <style scoped>
-.text-center { text-align: center; }
-.bold { font-weight: 600; }
+h2 i {
+  margin-right: 0.75rem;
+  color: var(--primary-color);
+}
 .report-options {
   display: flex;
+  flex-wrap: wrap;
   gap: 1.5rem;
+  margin-bottom: 2rem;
 }
-
+.form-group {
+  flex: 1 1 300px;
+}
+.text-center { text-align: center; }
+.bold { font-weight: 600; }
 .print-actions {
   margin-top: 1.5rem;
   padding-top: 1.5rem;
   border-top: 1px solid var(--border-color);
   text-align: right;
+}
+.no-data-message i {
+  font-size: 2.5rem;
+  color: var(--info-color);
+  margin-bottom: 1rem;
+}
+.no-data-message p {
+  font-size: 1.1rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
 }
 </style>

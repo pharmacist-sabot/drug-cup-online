@@ -1,7 +1,7 @@
 <template>
   <div class="print-container" v-if="processedData.length > 0">
     <div class="page">
-      <!-- Header -->
+
       <div class="header">
         <h2 class="bold">ใบสรุปยอดรวมการเบิกเวชภัณฑ์</h2>
         <div class="sub-header">
@@ -10,7 +10,6 @@
         </div>
       </div>
 
-      <!-- Items Table -->
       <div class="table-wrapper">
         <table>
           <thead>
@@ -19,6 +18,7 @@
               <th>รายการ</th>
               <th class="center">หน่วยนับ</th>
               <th class="center">ยอดรวมทั้งหมด</th>
+
               <th v-for="pcu in pcuList" :key="pcu.id" class="center pcu-header">{{ pcu.name }}</th>
             </tr>
           </thead>
@@ -76,7 +76,7 @@ onMounted(async () => {
       .select(`
         approved_quantity,
         items_drugcupsabot (id, name, unit_pack),
-        requisitions_drugcupsabot (pcu_id)
+        requisitions_drugcupsabot (pcu_id, status, period_id)
       `)
       .in('requisitions_drugcupsabot.status', ['approved', 'fulfilled'])
       .eq('requisitions_drugcupsabot.period_id', periodId);
@@ -84,6 +84,11 @@ onMounted(async () => {
     if (error) throw error;
     
     const summary = data.reduce((acc, current) => {
+      if (!current.requisitions_drugcupsabot || !current.items_drugcupsabot) {
+        console.warn('Skipping orphaned requisition item during print process:', current);
+        return acc; 
+      }
+      
       const itemId = current.items_drugcupsabot.id;
       const itemName = current.items_drugcupsabot.name;
       const unitPack = current.items_drugcupsabot.unit_pack;
@@ -131,7 +136,7 @@ function formatDate(dateString) {
 <style>
 @media print {
   @page {
-    size: A4 landscape; 
+    size: A4 landscape;
   }
 }
 </style>
@@ -151,8 +156,8 @@ body {
 }
 .page {
   background: white;
-  width: 297mm; 
-  min-height: 210mm; 
+  width: 297mm;
+  min-height: 210mm;
   padding: 15mm;
   margin: 10mm auto;
   box-sizing: border-box;
@@ -218,13 +223,11 @@ td.center, th.center {
   .page {
     padding: 10mm 15mm;
   }
-  
   thead {
-    display: table-header-group; 
+    display: table-header-group;
   }
-
   tr {
-    page-break-inside: avoid; 
+    page-break-inside: avoid;
   }
 }
 </style>
