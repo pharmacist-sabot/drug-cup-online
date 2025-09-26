@@ -1,5 +1,5 @@
 <template>
-  <div class="print-container" v-if="requisition">
+  <div class="print-container portrait" v-if="requisition">
     <div class="page">
       <!-- Header -->
       <div class="header">
@@ -164,12 +164,12 @@ function formatDate(dateString) {
 }
 </script>
 
-
 <style>
 @media print {
-  @page {
-    size: A4 portrait; 
+  @page portrait {
+    size: A4 portrait;
   }
+  .portrait { page: portrait; }
 }
 </style>
 

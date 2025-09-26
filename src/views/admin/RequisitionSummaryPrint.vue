@@ -1,5 +1,5 @@
 <template>
-  <div class="print-container" v-if="processedData.length > 0">
+  <div class="print-container landscape" v-if="processedData.length > 0">
     <div class="page">
 
       <div class="header">
@@ -18,7 +18,6 @@
               <th>รายการ</th>
               <th class="center">หน่วยนับ</th>
               <th class="center">ยอดรวมทั้งหมด</th>
-
               <th v-for="pcu in pcuList" :key="pcu.id" class="center pcu-header">{{ pcu.name }}</th>
             </tr>
           </thead>
@@ -62,15 +61,12 @@ onMounted(async () => {
   }
 
   try {
-    // Fetch period name
     const { data: periodData } = await supabase.from('requisition_periods_drugcupsabot').select('name').eq('id', periodId).single();
     periodInfo.value = periodData;
 
-    // Fetch PCU names for header
     const { data: pcusData } = await supabase.from('pcus_drugcupsabot').select('id, name').order('name');
     pcuList.value = pcusData;
 
-    // Fetch and process data
     const { data, error } = await supabase
       .from('requisition_items_drugcupsabot')
       .select(`
@@ -135,9 +131,10 @@ function formatDate(dateString) {
 
 <style>
 @media print {
-  @page {
+  @page landscape {
     size: A4 landscape;
   }
+  .landscape { page: landscape; }
 }
 </style>
 
