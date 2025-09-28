@@ -1,4 +1,4 @@
-// src/supabaseClient.js (ชื่อไฟล์ใหม่)
+// src/supabaseClient.js
 
 import { createClient } from '@supabase/supabase-js'
 
