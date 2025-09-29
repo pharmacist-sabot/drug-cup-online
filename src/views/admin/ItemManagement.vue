@@ -9,7 +9,8 @@
       <div class="toolbar">
         <input type="text" v-model="searchTerm" placeholder="ค้นหารายการ..." class="search-input">
         <button @click="openAddItemModal" class="btn btn-success">
-          <i class="fas fa-plus"></i> เพิ่มรายการใหม่
+          <i class="fas fa-plus"></i>
+          <span>เพิ่มรายการใหม่</span>
         </button>
       </div>
 
@@ -39,7 +40,8 @@
               </td>
               <td class="text-center">
                 <button @click="updateItem(item)" class="btn btn-primary btn-sm">
-                  <i class="fas fa-save"></i> บันทึก
+                  <i class="fas fa-save"></i>
+                  <span>บันทึก</span>
                 </button>
               </td>
             </tr>
@@ -74,16 +76,14 @@
               <option value="--new--">-- เพิ่มหมวดหมู่ใหม่ --</option>
             </select>
           </div>
-
           <div v-if="newItem.category === '--new--'" class="form-group">
             <label for="new_category_name">ชื่อหมวดหมู่ใหม่ <span class="required">*</span></label>
             <input type="text" id="new_category_name" v-model="newCategoryName" required>
           </div>
-          
           <div class="modal-actions">
             <button type="button" class="btn btn-secondary" @click="showAddItemModal = false">ยกเลิก</button>
             <button type="submit" class="btn btn-success" :disabled="isSubmitting">
-              <i class="fas fa-plus"></i> {{ isSubmitting ? 'กำลังเพิ่ม...' : 'เพิ่มรายการ' }}
+              <i class="fas fa-plus"></i> <span>{{ isSubmitting ? 'กำลังเพิ่ม...' : 'เพิ่มรายการ' }}</span>
             </button>
           </div>
         </form>
@@ -237,24 +237,12 @@ table {
   width: 100%;
 }
 
-.col-name {
-  width: auto; 
-}
-.col-price {
-  width: 120px;
-}
-.col-unit {
-  width: 120px;
-}
-.col-notes {
-  width: 25%;
-}
-.col-status {
-  width: 130px;
-}
-.col-actions {
-  width: 120px;
-}
+.col-name { width: auto; }
+.col-price { width: 120px; }
+.col-unit { width: 120px; }
+.col-notes { width: 25%; }
+.col-status { width: 130px; }
+.col-actions { width: 120px; }
 
 .toolbar {
   display: flex;
@@ -294,43 +282,58 @@ input:checked + .slider:before { transform: translateX(26px); }
 
 /* Modal Styles */
 .modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
   background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 2000;
+  display: flex; justify-content: center; align-items: center; z-index: 2000;
 }
 .modal-content {
-  width: 90%;
-  max-width: 600px;
-  max-height: 90vh;
-  overflow-y: auto;
-  padding: 2rem;
+  width: 90%; max-width: 600px; max-height: 90vh;
+  overflow-y: auto; padding: 2rem;
 }
-.modal-content h3 {
-  margin-top: 0;
-  text-align: center;
+.modal-content h3 { margin-top: 0; text-align: center; }
+.modal-content h3 i { color: var(--success-color); }
+.modal-actions { margin-top: 2rem; display: flex; justify-content: flex-end; gap: 1rem; }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.required { color: var(--danger-color); }
+
+@media (max-width: 992px) {
+  table {
+    table-layout: auto; 
+    min-width: 800px; 
+  }
+
+  th, td {
+    white-space: nowrap; 
+  }
+
+  th.col-name, td:first-child, 
+  th.col-notes, td:nth-child(4) {
+    white-space: normal;
+  }
 }
-.modal-content h3 i {
-  color: var(--success-color);
-}
-.modal-actions {
-  margin-top: 2rem;
-  display: flex;
-  justify-content: flex-end;
-  gap: 1rem;
-}
-.form-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-}
-.required {
-  color: var(--danger-color);
+
+@media (max-width: 768px) {
+
+  .toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .search-input {
+    max-width: 100%;
+  }
+  .toolbar .btn {
+    justify-content: center;
+  }
+
+  .toolbar .btn span, .btn-sm span, .modal-actions .btn span {
+    display: inline;
+  }
+
+  .modal-content {
+    padding: 1.5rem 1rem;
+  }
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
 }
 </style>
