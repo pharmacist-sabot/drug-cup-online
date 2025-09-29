@@ -32,10 +32,17 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function logout() {
-    const { error } = await supabase.auth.signOut()
-    if (error) throw error
-    user.value = null
-    profile.value = null
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error('Supabase signOut error:', error.message);
+      }
+    } catch (e) {
+      console.error('Unexpected error during logout:', e);
+    } finally {
+      user.value = null;
+      profile.value = null;
+    }
   }
   
   const isLoggedIn = computed(() => !!user.value)
