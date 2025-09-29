@@ -1,5 +1,7 @@
+<!-- src/components/Sidebar.vue -->
 <template>
-  <aside class="sidebar no-print">
+
+  <aside class="sidebar no-print" :class="{ 'is-open': isOpen }">
     <div class="sidebar-header">
       <i class="fas fa-pills logo"></i>
       <div class="header-text">
@@ -33,6 +35,13 @@
   </aside>
 </template>
 
+<script setup>
+
+defineProps({
+  isOpen: Boolean
+});
+</script>
+
 <style scoped>
 .sidebar {
   width: 260px;
@@ -44,7 +53,8 @@
   position: fixed;
   top: 0;
   left: 0;
-  transition: width 0.3s ease;
+  transition: transform 0.3s ease;
+  z-index: 1100; 
 }
 
 .sidebar-header {
@@ -112,5 +122,15 @@
   background-color: var(--primary-color);
   color: white;
   box-shadow: var(--box-shadow);
+}
+
+@media (max-width: 992px) {
+  .sidebar {
+    transform: translateX(-100%); 
+    box-shadow: var(--box-shadow-lg);
+  }
+  .sidebar.is-open {
+    transform: translateX(0); 
+  }
 }
 </style>

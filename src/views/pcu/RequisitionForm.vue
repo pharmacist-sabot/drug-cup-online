@@ -21,7 +21,7 @@
               <th>ลำดับ</th>
               <th>ประเภท</th>
               <th>รายการเวชภัณฑ์</th>
-              <th>หน่วย</th>
+              <th>หน่วยนับ</th>
               <th class="text-right">ราคา</th>
               <th class="text-center">จำนวนเบิก</th>
               <th class="text-right">มูลค่า</th>
@@ -252,7 +252,7 @@ function saveDraft() {
 }
 
 function submitForm() {
-  if (confirm('คุณต้องการยืนยันการส่งใบเบิกนี้ใช่หรือไม่? เมื่อส่งแล้วจะไม่สามารถแก้ไขได้อีก (ยกเว้น Admin)')) {
+  if (confirm('คุณต้องการยืนยันการส่งใบเบิกนี้ใช่หรือไม่? เมื่อส่งแล้วจะไม่สามารถแก้ไขได้อีก')) {
     saveRequisition('submitted');
   }
 }
@@ -293,6 +293,11 @@ table thead {
   top: 0;
   z-index: 1;
 }
+
+table thead th {
+  background-color: var(--surface-color);
+}
+
 .quantity-input {
   width: 90px;
   text-align: center;
@@ -322,4 +327,37 @@ td.text-center, th.text-center {
   font-size: 0.9em;
 }
 
+@media (max-width: 768px) {
+  h2 {
+    font-size: 1.4rem; 
+  }
+
+  .table-wrapper {
+    max-height: 65vh; 
+  }
+
+  th, td {
+    padding: 0.8rem 0.6rem;
+    font-size: 0.9rem; 
+    white-space: nowrap; 
+  }
+
+  th:nth-child(3),
+  td:nth-child(3) {
+    min-width: 200px; 
+    white-space: normal;
+  }
+
+  .quantity-input {
+    width: 75px; 
+    padding: 0.5rem;
+  }
+
+  .item-note {
+    display: block; 
+    margin-left: 0;
+    margin-top: 0.25rem;
+    white-space: normal;
+  }
+}
 </style>

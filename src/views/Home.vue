@@ -84,4 +84,16 @@ function goTo(path) {
   padding: 0.75rem;
   font-size: 1.1rem;
 }
+
+button {
+  width: 100%;
+  margin-top: 1rem;
+  padding: 0.75rem;
+  font-size: 1.1rem;
+  justify-content: center; 
+}
+
+button span {
+  display: inline;
+}
 </style>

@@ -18,7 +18,7 @@
         <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
         <button type="submit" class="btn btn-primary" :disabled="loading">
           <i class="fas fa-sign-in-alt"></i>
-          {{ loading ? 'กำลังเข้าสู่ระบบ...' : 'เข้าสู่ระบบ' }}
+          <span>{{ loading ? 'กำลังเข้าสู่ระบบ...' : 'เข้าสู่ระบบ' }}</span>
         </button>
       </form>
     </div>
@@ -62,7 +62,7 @@ async function handleLogin() {
   top: 0;
   left: 0;
   height: 100vh; 
-  background: linear-gradient(135deg, #e6f0ff, #f8f9fa);
+  background: linear-gradient(135deg, #F5F1FF 0%, #E6F7FF 100%);
 }
 
 .login-container {
@@ -108,11 +108,23 @@ button {
   margin-top: 1rem;
   padding: 0.75rem;
   font-size: 1.1rem;
+  justify-content: center; 
+}
+
+button span {
+  display: inline;
 }
 
 .error-message {
   color: var(--danger-color);
   margin-top: 1rem;
   font-size: 0.9rem;
+}
+
+@media (max-width: 480px) {
+  .login-container {
+    padding: 2rem 1.5rem;
+    margin: 0 1rem;
+  }
 }
 </style>

@@ -172,7 +172,7 @@ function formatCurrency(value) {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 1.5rem;
-  background-color: var(--light-color);
+  background-color: var(--bg-color);
   padding: 1.5rem;
   border-radius: var(--border-radius);
   margin-bottom: 2rem;
@@ -181,7 +181,7 @@ function formatCurrency(value) {
 
 .summary-grid strong {
   display: block;
-  color: var(--secondary-color);
+  color: var(--text-muted);
   margin-bottom: 0.25rem;
   font-size: 0.9rem;
 }
@@ -191,20 +191,6 @@ function formatCurrency(value) {
   font-size: 1.1rem;
   font-weight: 600;
 }
-
-.status-badge {
-  padding: 0.3em 0.7em;
-  border-radius: 12px;
-  color: white;
-  font-size: 0.9rem;
-  font-weight: bold;
-  text-transform: capitalize;
-}
-
-.status-badge.draft { background-color: var(--secondary-color); }
-.status-badge.submitted { background-color: var(--warning-color); color: var(--dark-color); }
-.status-badge.approved { background-color: var(--primary-color); }
-.status-badge.fulfilled { background-color: var(--success-color); }
 
 .table-wrapper {
   overflow-x: auto;
@@ -223,7 +209,7 @@ th, td {
 }
 
 thead {
-  background-color: var(--light-color);
+  background-color: transparent;
   font-weight: 600;
 }
 
@@ -232,12 +218,12 @@ thead {
 .bold { font-weight: bold; }
 
 .status-approved {
-    color: var(--success-color);
+    color: #2E7D32; 
     font-weight: bold;
 }
 
 tfoot { 
-  background-color: #e9ecef; 
+  background-color: var(--bg-color); 
   font-weight: bold;
 }
 </style>
