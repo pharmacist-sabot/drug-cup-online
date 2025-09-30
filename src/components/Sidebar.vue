@@ -27,6 +27,10 @@
         <i class="fas fa-print"></i>
         <span>พิมพ์รายงาน</span>
       </router-link>
+      <router-link to="/admin/accounting-report">
+        <i class="fas fa-file-invoice-dollar"></i>
+        <span>รายงานบัญชี</span>
+      </router-link>
       <router-link to="/admin/settings">
         <i class="fas fa-cog"></i>
         <span>ตั้งค่าระบบ</span>

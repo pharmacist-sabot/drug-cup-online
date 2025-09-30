@@ -19,6 +19,8 @@ import RequisitionSummary from '@/views/admin/RequisitionSummary.vue'
 import PrintableView from '@/views/admin/PrintableView.vue'
 import RequisitionSummaryPrint from '@/views/admin/RequisitionSummaryPrint.vue'
 import SystemSettings from '@/views/admin/SystemSettings.vue';
+import AccountingReport from '@/views/admin/AccountingReport.vue';
+import AccountingReportPrint from '@/views/admin/AccountingReportPrint.vue';
 
 // Define Routes 
 const routes = [
@@ -109,6 +111,18 @@ const routes = [
     path: '/print/summary',
     name: 'PrintRequisitionSummary',
     component: RequisitionSummaryPrint,
+    meta: { requiresAuth: true, requiresAdmin: true }
+  },
+   {
+    path: '/admin/accounting-report',
+    name: 'AccountingReport',
+    component: AccountingReport,
+    meta: { requiresAuth: true, requiresAdmin: true }
+  },
+  {
+    path: '/print/accounting-report',
+    name: 'AccountingReportPrint',
+    component: AccountingReportPrint,
     meta: { requiresAuth: true, requiresAdmin: true }
   },
 
