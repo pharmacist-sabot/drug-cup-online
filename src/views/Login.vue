@@ -20,6 +20,9 @@
           <i class="fas fa-sign-in-alt"></i>
           <span>{{ loading ? 'กำลังเข้าสู่ระบบ...' : 'เข้าสู่ระบบ' }}</span>
         </button>
+        <div class="register-link">
+          ยังไม่มีบัญชี? <router-link to="/register">ลงทะเบียนที่นี่</router-link>
+        </div>
       </form>
     </div>
   </div>
@@ -119,6 +122,12 @@ button span {
   color: var(--danger-color);
   margin-top: 1rem;
   font-size: 0.9rem;
+}
+
+.register-link {
+  margin-top: 1.5rem;
+  font-size: 0.9rem;
+  color: var(--text-muted);
 }
 
 @media (max-width: 480px) {

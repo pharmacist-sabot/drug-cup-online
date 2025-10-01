@@ -4,6 +4,7 @@ import { useAuthStore } from '@/store/auth'
 // Import Components 
 import Login from '@/views/Login.vue'
 import Home from '@/views/Home.vue'
+import Register from '@/views/Register.vue'
 
 // PCU Views
 import PcuDashboard from '@/views/pcu/PcuDashboard.vue'
@@ -29,6 +30,11 @@ const routes = [
     path: '/login', 
     name: 'Login', 
     component: Login 
+  },
+  { 
+    path: '/register', 
+    name: 'Register', 
+    component: Register 
   },
 
   // Authenticated Routes 
