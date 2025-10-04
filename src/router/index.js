@@ -5,7 +5,7 @@ import { useAuthStore } from '@/store/auth'
 import Login from '@/views/Login.vue'
 import Home from '@/views/Home.vue'
 import Register from '@/views/Register.vue'
-import WaitingForApproval from '@/views/WaitingForApproval.vue'
+import WaitingForApproval from '@/views/WaitingForApproval.vue' 
 
 // PCU Views
 import PcuDashboard from '@/views/pcu/PcuDashboard.vue'
@@ -161,6 +161,10 @@ const router = createRouter({
 router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore()
 
+  if (to.name === 'WaitingForApproval') {
+    return next();
+  }
+  
   if (!authStore.isLoggedIn) {
     await authStore.fetchSession()
   }
