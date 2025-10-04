@@ -12,9 +12,6 @@
       <p class="sub-message">
         คุณจะสามารถเข้าสู่ระบบได้หลังจากที่บัญชีของคุณได้รับการอนุมัติ
       </p>
-      <div class="actions">
-        <router-link to="/login" class="btn btn-primary">กลับไปหน้าเข้าสู่ระบบ</router-link>
-      </div>
     </div>
   </div>
 </template>
