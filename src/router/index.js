@@ -5,6 +5,7 @@ import { useAuthStore } from '@/store/auth'
 import Login from '@/views/Login.vue'
 import Home from '@/views/Home.vue'
 import Register from '@/views/Register.vue'
+import WaitingForApproval from '@/views/WaitingForApproval.vue'
 
 // PCU Views
 import PcuDashboard from '@/views/pcu/PcuDashboard.vue'
@@ -22,6 +23,8 @@ import RequisitionSummaryPrint from '@/views/admin/RequisitionSummaryPrint.vue'
 import SystemSettings from '@/views/admin/SystemSettings.vue';
 import AccountingReport from '@/views/admin/AccountingReport.vue';
 import AccountingReportPrint from '@/views/admin/AccountingReportPrint.vue';
+import UserManagement from '@/views/admin/UserManagement.vue';
+
 
 // Define Routes 
 const routes = [
@@ -35,6 +38,11 @@ const routes = [
     path: '/register', 
     name: 'Register', 
     component: Register 
+  },
+  {
+    path: '/waiting-for-approval',
+    name: 'WaitingForApproval',
+    component: WaitingForApproval
   },
 
   // Authenticated Routes 
@@ -75,6 +83,12 @@ const routes = [
     meta: { requiresAuth: true, requiresAdmin: true }
   },
   {
+    path: '/admin/user-management',
+    name: 'UserManagement',
+    component: UserManagement,
+    meta: { requiresAuth: true, requiresAdmin: true }
+  },
+  {
     path: '/admin/requisition/:requisitionId',
     name: 'AdminRequisitionDetail',
     component: AdminRequisitionDetail,
@@ -106,7 +120,7 @@ const routes = [
     meta: { requiresAuth: true, requiresAdmin: true }
   },
   
-  // Print Routes (No Layout)
+  // Print Routes 
   {
     path: '/print/requisition',
     name: 'PrintRequisition',

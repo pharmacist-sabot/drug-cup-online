@@ -47,7 +47,7 @@ async function handleLogin() {
     await authStore.login(email.value, password.value);
     router.push('/');
   } catch (error) {
-    errorMessage.value = error.message || 'อีเมลหรือรหัสผ่านไม่ถูกต้อง';
+    errorMessage.value = error.message; 
   } finally {
     loading.value = false;
   }

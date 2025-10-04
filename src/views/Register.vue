@@ -85,10 +85,8 @@
 import { ref, onMounted } from 'vue';
 import { supabase } from '@/supabaseClient';
 import { useRouter } from 'vue-router';
-import { useAuthStore } from '@/store/auth';
 
 const router = useRouter();
-const authStore = useAuthStore();
 const pcuList = ref([]);
 const isPcuLoading = ref(true);
 const loading = ref(false);
@@ -145,19 +143,16 @@ async function handleRegister() {
       options: {
         data: {
           username: form.value.username.trim(),
-          pcu_id: form.value.pcu_id 
+          pcu_id: form.value.pcu_id,
+          email: form.value.email.trim()
         }
       }
     });
     
     if (error) throw error;
 
-    if (data.session) {
-      await authStore.login(form.value.email, form.value.password);
-      router.push('/');
-    } else {
-      errorMessage.value = "กรุณาตรวจสอบอีเมลของคุณเพื่อยืนยันการลงทะเบียน";
-    }
+    alert("การลงทะเบียนสำเร็จ! กรุณารอการอนุมัติจากผู้ดูแลระบบก่อนเข้าใช้งาน");
+    router.push('/login');
 
   } catch (error) {
     console.error('Registration error:', error);

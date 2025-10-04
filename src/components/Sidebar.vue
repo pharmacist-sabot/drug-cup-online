@@ -35,6 +35,10 @@
         <i class="fas fa-cog"></i>
         <span>ตั้งค่าระบบ</span>
       </router-link>
+            <router-link to="/admin/user-management">
+        <i class="fas fa-user-check"></i>
+        <span>อนุมัติผู้ใช้งาน</span>
+      </router-link>
     </nav>
   </aside>
 </template>
