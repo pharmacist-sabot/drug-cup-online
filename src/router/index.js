@@ -24,6 +24,8 @@ import SystemSettings from '@/views/admin/SystemSettings.vue';
 import AccountingReport from '@/views/admin/AccountingReport.vue';
 import AccountingReportPrint from '@/views/admin/AccountingReportPrint.vue';
 import UserManagement from '@/views/admin/UserManagement.vue';
+import MemoGenerator from '@/views/admin/MemoGenerator.vue';
+import ApprovalMemoPrint from '@/views/admin/ApprovalMemoPrint.vue';
 
 
 // Define Routes 
@@ -143,6 +145,18 @@ const routes = [
     path: '/print/accounting-report',
     name: 'AccountingReportPrint',
     component: AccountingReportPrint,
+    meta: { requiresAuth: true, requiresAdmin: true }
+  },
+  {
+    path: '/admin/memo-generator',
+    name: 'MemoGenerator',
+    component: MemoGenerator,
+    meta: { requiresAuth: true, requiresAdmin: true }
+  },
+  {
+    path: '/print/approval-memo',
+    name: 'ApprovalMemoPrint',
+    component: ApprovalMemoPrint,
     meta: { requiresAuth: true, requiresAdmin: true }
   },
 

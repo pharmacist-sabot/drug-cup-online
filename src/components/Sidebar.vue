@@ -25,19 +25,23 @@
       </router-link>
       <router-link to="/admin/reports">
         <i class="fas fa-print"></i>
-        <span>พิมพ์รายงาน</span>
+        <span>พิมพ์รายงานใบเบิก</span>
+      </router-link>
+      <router-link to="/admin/memo-generator">
+        <i class="fas fa-file-signature"></i>
+        <span>พิมพ์บันทึกข้อความ</span>
       </router-link>
       <router-link to="/admin/accounting-report">
         <i class="fas fa-file-invoice-dollar"></i>
         <span>รายงานบัญชี</span>
       </router-link>
+      <router-link to="/admin/user-management">
+        <i class="fas fa-user-check"></i>
+        <span>อนุมัติผู้ใช้งาน</span>
+      </router-link>
       <router-link to="/admin/settings">
         <i class="fas fa-cog"></i>
         <span>ตั้งค่าระบบ</span>
-      </router-link>
-            <router-link to="/admin/user-management">
-        <i class="fas fa-user-check"></i>
-        <span>อนุมัติผู้ใช้งาน</span>
       </router-link>
     </nav>
   </aside>
