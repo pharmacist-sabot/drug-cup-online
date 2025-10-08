@@ -23,6 +23,7 @@
               <th>รายการเวชภัณฑ์</th>
               <th>หน่วยนับ</th>
               <th class="text-right">ราคา</th>
+              <th class="text-center">คงเหลือ</th>
               <th class="text-center">จำนวนเบิก</th>
               <th class="text-right">มูลค่า</th>
             </tr>
@@ -42,10 +43,20 @@
               <td class="text-right">{{ formatCurrency(item.price_per_unit) }}</td>
               <td class="text-center">
                 <input 
+                  type="number"
+                  min="0"
+                  class="quantity-input"
+                  v-model.number="requisitionData[item.id].onHand"
+                  @focus="$event.target.select()"
+                  :disabled="!item.is_available"
+                >
+              </td>
+              <td class="text-center">
+                <input 
                   type="number" 
                   min="0"
                   class="quantity-input" 
-                  v-model.number="requisitionData[item.id]"
+                  v-model.number="requisitionData[item.id].quantity"
                   @input="updateTotal"
                   @focus="$event.target.select()"
                   :disabled="!item.is_available" 
@@ -56,7 +67,7 @@
           </tbody>
           <tfoot>
             <tr>
-              <td colspan="6" class="text-right bold">รวมมูลค่าทั้งหมด</td>
+              <td colspan="7" class="text-right bold">รวมมูลค่าทั้งหมด</td>
               <td class="text-right bold">{{ formatCurrency(totalValue) }}</td>
             </tr>
           </tfoot>
@@ -120,17 +131,24 @@ onMounted(async () => {
     if (itemsError) throw itemsError
     items.value = itemsData
 
+    items.value.forEach(item => {
+      requisitionData.value[item.id] = { quantity: null, onHand: null };
+    });
+
     if (isEditing.value) {
       const { data: existingData, error: draftError } = await supabase
         .from('requisition_items_drugcupsabot')
-        .select('item_id, quantity')
+        .select('item_id, quantity, on_hand_quantity')
         .eq('requisition_id', props.requisitionId)
       
       if (draftError) throw draftError
 
       if (existingData) {
         existingData.forEach(item => {
-          requisitionData.value[item.item_id] = item.quantity
+          if (requisitionData.value[item.item_id]) {
+            requisitionData.value[item.item_id].quantity = item.quantity;
+            requisitionData.value[item.item_id].onHand = item.on_hand_quantity;
+          }
         })
         updateTotal()
       }
@@ -153,12 +171,12 @@ const filteredItems = computed(() => {
 
 function calculateValue(item) {
   if (!item.is_available) {
-    if (requisitionData.value[item.id]) {
-      requisitionData.value[item.id] = 0;
+    if (requisitionData.value[item.id]?.quantity) {
+      requisitionData.value[item.id].quantity = 0;
     }
     return 0;
   }
-  const quantity = requisitionData.value[item.id] || 0
+  const quantity = requisitionData.value[item.id]?.quantity || 0
   return quantity * item.price_per_unit
 }
 
@@ -206,16 +224,17 @@ async function saveRequisition(status) {
     if (deleteError) throw deleteError;
 
     const itemsToInsert = Object.entries(requisitionData.value)
-      .filter(([itemId, quantity]) => {
+      .filter(([itemId, entry]) => {
         const itemDetails = items.value.find(i => i.id == itemId);
-        return quantity > 0 && quantity !== null && itemDetails && itemDetails.is_available;
+        return entry.quantity > 0 && entry.quantity !== null && itemDetails && itemDetails.is_available;
       })
-      .map(([itemId, quantity]) => {
+      .map(([itemId, entry]) => {
         const itemDetails = items.value.find(i => i.id == itemId);
         return {
           requisition_id: currentRequisitionId,
           item_id: Number(itemId),
-          quantity: quantity,
+          quantity: entry.quantity,
+          on_hand_quantity: entry.onHand,
           price_at_request: itemDetails.price_per_unit
         };
       });

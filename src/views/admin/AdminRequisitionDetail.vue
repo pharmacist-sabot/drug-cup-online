@@ -30,6 +30,7 @@
             <tr>
               <th class="text-center">ลำดับ</th>
               <th>รายการเวชภัณฑ์</th>
+              <th class="text-center">ยอดคงเหลือ (ที่แจ้ง)</th>
               <th class="text-center">จำนวนขอเบิก</th>
               <th class="text-center">จำนวนอนุมัติ</th>
               <th class="text-right">ราคา/หน่วย</th>
@@ -40,6 +41,7 @@
             <tr v-for="(reqItem, index) in editableItems" :key="reqItem.id">
               <td class="text-center">{{ index + 1 }}</td>
               <td>{{ reqItem.items_drugcupsabot.name }}</td>
+              <td class="text-center">{{ reqItem.on_hand_quantity ?? '-' }}</td>
               <td class="text-center">{{ reqItem.quantity }}</td>
               <td>
                 <input 
@@ -56,7 +58,7 @@
           </tbody>
           <tfoot>
             <tr>
-              <td colspan="5" class="text-right bold">มูลค่ารวมที่อนุมัติ</td>
+              <td colspan="6" class="text-right bold">มูลค่ารวมที่อนุมัติ</td>
               <td class="text-right bold">{{ formatCurrency(grandTotalApproved) }}</td>
             </tr>
           </tfoot>

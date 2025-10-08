@@ -99,7 +99,7 @@ const requisitionId = route.query.id;
 const emptyRows = computed(() => {
   if (!requisition.value) return 0;
   const itemCount = requisition.value.requisition_items_drugcupsabot.length;
-  return Math.max(0, 15 - itemCount);
+  return Math.max(0, 1 - itemCount);
 });
 
 onMounted(async () => {
