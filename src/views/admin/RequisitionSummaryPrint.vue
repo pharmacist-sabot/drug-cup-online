@@ -71,7 +71,7 @@ onMounted(async () => {
       .from('requisition_items_drugcupsabot')
       .select(`
         approved_quantity,
-        items_drugcupsabot (id, name, unit_pack),
+        items_drugcupsabot (id, name, unit_pack, category_order, item_order),
         requisitions_drugcupsabot (pcu_id, status, period_id)
       `)
       .in('requisitions_drugcupsabot.status', ['approved', 'fulfilled'])
@@ -88,6 +88,8 @@ onMounted(async () => {
       const itemId = current.items_drugcupsabot.id;
       const itemName = current.items_drugcupsabot.name;
       const unitPack = current.items_drugcupsabot.unit_pack;
+      const categoryOrder = current.items_drugcupsabot.category_order;
+      const itemOrder = current.items_drugcupsabot.item_order;
       const pcuId = current.requisitions_drugcupsabot.pcu_id;
       const qty = current.approved_quantity || 0;
 
@@ -97,7 +99,9 @@ onMounted(async () => {
           item_name: itemName,
           unit_pack: unitPack,
           total_quantity: 0,
-          pcu_breakdown: {}
+          pcu_breakdown: {},
+          category_order: categoryOrder,
+          item_order: itemOrder,
         };
       }
       
@@ -107,7 +111,15 @@ onMounted(async () => {
       return acc;
     }, {});
 
-    processedData.value = Object.values(summary).sort((a,b) => a.item_name.localeCompare(b.item_name));
+    processedData.value = Object.values(summary).sort((a, b) => {
+      const categoryDiff = (a.category_order || 9999) - (b.category_order || 9999);
+      if (categoryDiff !== 0) return categoryDiff;
+
+      const itemDiff = (a.item_order || 9999) - (b.item_order || 9999);
+      if (itemDiff !== 0) return itemDiff;
+      
+      return a.item_name.localeCompare(b.item_name, 'th');
+    });
 
     setTimeout(() => {
       window.print();

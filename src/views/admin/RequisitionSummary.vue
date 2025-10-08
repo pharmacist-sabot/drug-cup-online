@@ -97,7 +97,7 @@ async function processRequisitions() {
       .from('requisition_items_drugcupsabot')
       .select(`
         approved_quantity,
-        items_drugcupsabot (id, name),
+        items_drugcupsabot (id, name, category_order, item_order),
         requisitions_drugcupsabot (pcu_id, status, period_id)
       `)
       .in('requisitions_drugcupsabot.status', ['approved', 'fulfilled'])
@@ -106,7 +106,6 @@ async function processRequisitions() {
     if (fetchError) throw fetchError;
     
     const summary = data.reduce((acc, current) => {
-
       if (!current.requisitions_drugcupsabot || !current.items_drugcupsabot) {
         console.warn('Skipping orphaned requisition item:', current);
         return acc; 
@@ -114,6 +113,8 @@ async function processRequisitions() {
       
       const itemId = current.items_drugcupsabot.id;
       const itemName = current.items_drugcupsabot.name;
+      const categoryOrder = current.items_drugcupsabot.category_order;
+      const itemOrder = current.items_drugcupsabot.item_order;
       const pcuId = current.requisitions_drugcupsabot.pcu_id;
       const qty = current.approved_quantity || 0;
 
@@ -122,7 +123,9 @@ async function processRequisitions() {
           item_id: itemId,
           item_name: itemName,
           total_quantity: 0,
-          pcu_breakdown: {}
+          pcu_breakdown: {},
+          category_order: categoryOrder,
+          item_order: itemOrder,
         };
       }
       
@@ -132,7 +135,15 @@ async function processRequisitions() {
       return acc;
     }, {});
 
-    processedData.value = Object.values(summary).sort((a,b) => a.item_name.localeCompare(b.item_name));
+    processedData.value = Object.values(summary).sort((a, b) => {
+      const categoryDiff = (a.category_order || 9999) - (b.category_order || 9999);
+      if (categoryDiff !== 0) return categoryDiff;
+      
+      const itemDiff = (a.item_order || 9999) - (b.item_order || 9999);
+      if (itemDiff !== 0) return itemDiff;
+      
+      return a.item_name.localeCompare(b.item_name, 'th');
+    });
     
   } catch (err) {
     console.error("Error processing requisitions:", err);
