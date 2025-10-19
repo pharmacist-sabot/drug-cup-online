@@ -1,212 +1,213 @@
-import { createRouter, createWebHistory } from 'vue-router'
-import { useAuthStore } from '@/store/auth'
+import { createRouter, createWebHistory } from "vue-router";
+import { useAuthStore } from "@/store/auth";
 
-// Import Components 
-import Login from '@/views/Login.vue'
-import Home from '@/views/Home.vue'
-import Register from '@/views/Register.vue'
-import WaitingForApproval from '@/views/WaitingForApproval.vue' 
+// Import Components
+import Login from "@/views/Login.vue";
+import Home from "@/views/Home.vue";
+import Register from "@/views/Register.vue";
+import WaitingForApproval from "@/views/WaitingForApproval.vue";
 
 // PCU Views
-import PcuDashboard from '@/views/pcu/PcuDashboard.vue'
-import RequisitionForm from '@/views/pcu/RequisitionForm.vue'
-import RequisitionDetail from '@/views/pcu/RequisitionDetail.vue' 
+import PcuDashboard from "@/views/pcu/PcuDashboard.vue";
+import RequisitionForm from "@/views/pcu/RequisitionForm.vue";
+import RequisitionDetail from "@/views/pcu/RequisitionDetail.vue";
 
 // Admin Views
-import AdminDashboard from '@/views/admin/AdminDashboard.vue'
-import AdminRequisitionDetail from '@/views/admin/AdminRequisitionDetail.vue'
-import ReportGenerator from '@/views/admin/ReportGenerator.vue'
-import ItemManagement from '@/views/admin/ItemManagement.vue'
-import RequisitionSummary from '@/views/admin/RequisitionSummary.vue'
-import PrintableView from '@/views/admin/PrintableView.vue'
-import RequisitionSummaryPrint from '@/views/admin/RequisitionSummaryPrint.vue'
-import SystemSettings from '@/views/admin/SystemSettings.vue';
-import AccountingReport from '@/views/admin/AccountingReport.vue';
-import AccountingReportPrint from '@/views/admin/AccountingReportPrint.vue';
-import UserManagement from '@/views/admin/UserManagement.vue';
-import MemoGenerator from '@/views/admin/MemoGenerator.vue';
-import ApprovalMemoPrint from '@/views/admin/ApprovalMemoPrint.vue';
+import AdminDashboard from "@/views/admin/AdminDashboard.vue";
+import AdminRequisitionDetail from "@/views/admin/AdminRequisitionDetail.vue";
+import ReportGenerator from "@/views/admin/ReportGenerator.vue";
+import ItemManagement from "@/views/admin/ItemManagement.vue";
+import RequisitionSummary from "@/views/admin/RequisitionSummary.vue";
+import PrintableView from "@/views/admin/PrintableView.vue";
+import RequisitionSummaryPrint from "@/views/admin/RequisitionSummaryPrint.vue";
+import SystemSettings from "@/views/admin/SystemSettings.vue";
+import AccountingReport from "@/views/admin/AccountingReport.vue";
+import AccountingReportPrint from "@/views/admin/AccountingReportPrint.vue";
+import UserManagement from "@/views/admin/UserManagement.vue";
+import MemoGenerator from "@/views/admin/MemoGenerator.vue";
+import ApprovalMemoPrint from "@/views/admin/ApprovalMemoPrint.vue";
 
-
-// Define Routes 
+// Define Routes
 const routes = [
   // Public Routes
-  { 
-    path: '/login', 
-    name: 'Login', 
-    component: Login 
-  },
-  { 
-    path: '/register', 
-    name: 'Register', 
-    component: Register 
+  {
+    path: "/login",
+    name: "Login",
+    component: Login,
   },
   {
-    path: '/waiting-for-approval',
-    name: 'WaitingForApproval',
-    component: WaitingForApproval
+    path: "/register",
+    name: "Register",
+    component: Register,
+  },
+  {
+    path: "/waiting-for-approval",
+    name: "WaitingForApproval",
+    component: WaitingForApproval,
   },
 
-  // Authenticated Routes 
-  { 
-    path: '/', 
-    name: 'Home', 
-    component: Home, 
-    meta: { requiresAuth: true } 
+  // Authenticated Routes
+  {
+    path: "/",
+    name: "Home",
+    component: Home,
+    meta: { requiresAuth: true },
   },
 
-  // PCU Specific Routes 
-  { 
-    path: '/pcu/dashboard', 
-    name: 'PcuDashboard', 
-    component: PcuDashboard, 
-    meta: { requiresAuth: true, requiresPcu: true } 
-  },
-  { 
-    path: '/pcu/requisition/:periodId/:requisitionId?', 
-    name: 'RequisitionForm', 
-    component: RequisitionForm, 
+  // PCU Specific Routes
+  {
+    path: "/pcu/dashboard",
+    name: "PcuDashboard",
+    component: PcuDashboard,
     meta: { requiresAuth: true, requiresPcu: true },
-    props: true 
   },
   {
-    path: '/pcu/history/:requisitionId',
-    name: 'RequisitionDetail',
+    path: "/pcu/requisition/:periodId/:requisitionId?",
+    name: "RequisitionForm",
+    component: RequisitionForm,
+    meta: { requiresAuth: true, requiresPcu: true },
+    props: true,
+  },
+  {
+    path: "/pcu/history/:requisitionId",
+    name: "RequisitionDetail",
     component: RequisitionDetail,
     meta: { requiresAuth: true, requiresPcu: true },
-    props: true
+    props: true,
   },
 
-  // Admin Specific Routes 
-  { 
-    path: '/admin/dashboard', 
-    name: 'AdminDashboard', 
-    component: AdminDashboard, 
-    meta: { requiresAuth: true, requiresAdmin: true }
+  // Admin Specific Routes
+  {
+    path: "/admin/dashboard",
+    name: "AdminDashboard",
+    component: AdminDashboard,
+    meta: { requiresAuth: true, requiresAdmin: true },
   },
   {
-    path: '/admin/user-management',
-    name: 'UserManagement',
+    path: "/admin/user-management",
+    name: "UserManagement",
     component: UserManagement,
-    meta: { requiresAuth: true, requiresAdmin: true }
+    meta: { requiresAuth: true, requiresAdmin: true },
   },
   {
-    path: '/admin/requisition/:requisitionId',
-    name: 'AdminRequisitionDetail',
+    path: "/admin/requisition/:requisitionId",
+    name: "AdminRequisitionDetail",
     component: AdminRequisitionDetail,
     meta: { requiresAuth: true, requiresAdmin: true },
-    props: true
+    props: true,
   },
-  { 
-    path: '/admin/item-management', 
-    name: 'ItemManagement',
+  {
+    path: "/admin/item-management",
+    name: "ItemManagement",
     component: ItemManagement,
-    meta: { requiresAuth: true, requiresAdmin: true }
+    meta: { requiresAuth: true, requiresAdmin: true },
   },
   {
-    path: '/admin/requisition-summary',
-    name: 'RequisitionSummary',
+    path: "/admin/requisition-summary",
+    name: "RequisitionSummary",
     component: RequisitionSummary,
-    meta: { requiresAuth: true, requiresAdmin: true }
-  },
-  { 
-    path: '/admin/reports', 
-    name: 'ReportGenerator', 
-    component: ReportGenerator, 
-    meta: { requiresAuth: true, requiresAdmin: true }
+    meta: { requiresAuth: true, requiresAdmin: true },
   },
   {
-    path: '/admin/settings', 
-    name: 'SystemSettings',
+    path: "/admin/reports",
+    name: "ReportGenerator",
+    component: ReportGenerator,
+    meta: { requiresAuth: true, requiresAdmin: true },
+  },
+  {
+    path: "/admin/settings",
+    name: "SystemSettings",
     component: SystemSettings,
-    meta: { requiresAuth: true, requiresAdmin: true }
-  },
-  
-  // Print Routes 
-  {
-    path: '/print/requisition',
-    name: 'PrintRequisition',
-    component: PrintableView,
-    meta: { requiresAuth: true, requiresAdmin: true }
-  },
-  {
-    path: '/print/summary',
-    name: 'PrintRequisitionSummary',
-    component: RequisitionSummaryPrint,
-    meta: { requiresAuth: true, requiresAdmin: true }
-  },
-   {
-    path: '/admin/accounting-report',
-    name: 'AccountingReport',
-    component: AccountingReport,
-    meta: { requiresAuth: true, requiresAdmin: true }
-  },
-  {
-    path: '/print/accounting-report',
-    name: 'AccountingReportPrint',
-    component: AccountingReportPrint,
-    meta: { requiresAuth: true, requiresAdmin: true }
-  },
-  {
-    path: '/admin/memo-generator',
-    name: 'MemoGenerator',
-    component: MemoGenerator,
-    meta: { requiresAuth: true, requiresAdmin: true }
-  },
-  {
-    path: '/print/approval-memo',
-    name: 'ApprovalMemoPrint',
-    component: ApprovalMemoPrint,
-    meta: { requiresAuth: true, requiresAdmin: true }
+    meta: { requiresAuth: true, requiresAdmin: true },
   },
 
-  // Fallback Route 
+  // Print Routes
   {
-    path: '/:pathMatch(.*)*',
-    redirect: '/'
-  }
-]
+    path: "/print/requisition",
+    name: "PrintRequisition",
+    component: PrintableView,
+    meta: { requiresAuth: true, requiresAdmin: true },
+  },
+  {
+    path: "/print/summary",
+    name: "PrintRequisitionSummary",
+    component: RequisitionSummaryPrint,
+    meta: { requiresAuth: true, requiresAdmin: true },
+  },
+  {
+    path: "/admin/accounting-report",
+    name: "AccountingReport",
+    component: AccountingReport,
+    meta: { requiresAuth: true, requiresAdmin: true },
+  },
+  {
+    path: "/print/accounting-report",
+    name: "AccountingReportPrint",
+    component: AccountingReportPrint,
+    meta: { requiresAuth: true, requiresAdmin: true },
+  },
+  {
+    path: "/admin/memo-generator",
+    name: "MemoGenerator",
+    component: MemoGenerator,
+    meta: { requiresAuth: true, requiresAdmin: true },
+  },
+  {
+    path: "/print/approval-memo",
+    name: "ApprovalMemoPrint",
+    component: ApprovalMemoPrint,
+    meta: { requiresAuth: true, requiresAdmin: true },
+  },
+
+  // Fallback Route
+  {
+    path: "/:pathMatch(.*)*",
+    redirect: "/",
+  },
+];
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes,
-})
+});
 
 router.beforeEach(async (to, from, next) => {
-  const authStore = useAuthStore()
+  const authStore = useAuthStore();
 
-  if (to.name === 'WaitingForApproval') {
+  if (to.name === "WaitingForApproval") {
     return next();
   }
-  
+
   if (!authStore.isLoggedIn) {
-    await authStore.fetchSession()
+    await authStore.fetchSession();
   }
 
-  const requiresAuth = to.matched.some(record => record.meta.requiresAuth)
+  const requiresAuth = to.matched.some((record) => record.meta.requiresAuth);
 
   if (requiresAuth && !authStore.isLoggedIn) {
-    return next({ name: 'Login', query: { redirect: to.fullPath } });
-  } 
-  
-  if (to.name === 'Login' && authStore.isLoggedIn) {
-    return next({ name: 'Home' });
+    return next({ name: "Login", query: { redirect: to.fullPath } });
   }
 
-  const isAdminRoute = to.matched.some(record => record.meta.requiresAdmin);
-  const isPcuRoute = to.matched.some(record => record.meta.requiresPcu);
+  if (to.name === "Login" && authStore.isLoggedIn) {
+    return next({ name: "Home" });
+  }
+
+  const isAdminRoute = to.matched.some((record) => record.meta.requiresAdmin);
+  const isPcuRoute = to.matched.some((record) => record.meta.requiresPcu);
 
   if (isAdminRoute && !authStore.isAdmin) {
-    console.warn('Access denied: Non-admin user trying to access an admin route.');
-    return next({ name: 'Home' });
+    console.warn(
+      "Access denied: Non-admin user trying to access an admin route.",
+    );
+    return next({ name: "Home" });
   }
 
   if (isPcuRoute && authStore.isAdmin) {
-    console.warn('Access denied: Admin user trying to access a PCU route.');
-    return next({ name: 'Home' });
+    console.warn("Access denied: Admin user trying to access a PCU route.");
+    return next({ name: "Home" });
   }
 
-  next()
-})
+  next();
+});
 
-export default router
+export default router;
